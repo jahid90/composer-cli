@@ -1,0 +1,7 @@
+version: {{ .Values.version }}
+
+commands:
+  hello: 'echo hello'
+  list: 'ls'
+  start:dev: 'PORT={{.Values.port }} yarn start'
+
