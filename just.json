@@ -1,9 +1,0 @@
-{
-    "version": "4",
-    "commands": {
-        "build": "go build",
-        "test:local": "./composer compose --in test-data/template.yaml --values test-data/values.yaml --out test-data/generated.yaml | tee test-data/generated.yaml",
-        "install": "go install",
-        "test": "composer compose --in test-data/template.yaml --values test-data/values.yaml --out test-data/generated.yaml | tee test-data/generated.yaml"
-    }
-}
