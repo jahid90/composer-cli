@@ -12,14 +12,21 @@ func Cmd() *cli.Command {
 		Name:  "docker",
 		Usage: "Composes a docker-compose.yaml file",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "set",
-				Usage: "The value overrides",
+			&cli.StringSliceFlag{
+				Name:     "set",
+				Usage:    "The values overrides",
+				Aliases:  []string{"s"},
+				Required: false,
 			},
 		},
 		Action: func(c *cli.Context) error {
 
-			processed, err := process.InterpolateFile("template.yaml", "values.yaml")
+			overrides, err := process.ProcessOverrides(c.StringSlice("set"))
+			if err != nil {
+				return err
+			}
+
+			processed, err := process.InterpolateFile("template.yaml", "values.yaml", overrides)
 			if err != nil {
 				return err
 			}

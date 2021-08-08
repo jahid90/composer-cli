@@ -15,20 +15,24 @@ func Cmd() *cli.Command {
 		Usage: "Interpolate values into a template to compose a file",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:  "in",
-				Usage: "The template file",
+				Name:     "in",
+				Usage:    "The template file",
+				Required: true,
 			},
 			&cli.StringFlag{
-				Name:  "out",
-				Usage: "The output file",
+				Name:     "values",
+				Usage:    "The file with the values",
+				Required: true,
 			},
 			&cli.StringFlag{
-				Name:  "values",
-				Usage: "The file with the values",
+				Name:     "out",
+				Usage:    "The output file",
+				Required: false,
 			},
-			&cli.StringFlag{
-				Name:  "set",
-				Usage: "The value overrides",
+			&cli.StringSliceFlag{
+				Name:     "set",
+				Usage:    "The value overrides",
+				Required: false,
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -36,7 +40,12 @@ func Cmd() *cli.Command {
 			templateFile := c.String("in")
 			valuesFile := c.String("values")
 
-			processed, err := process.InterpolateFile(templateFile, valuesFile)
+			overrides, err := process.ProcessOverrides(c.StringSlice("set"))
+			if err != nil {
+				return err
+			}
+
+			processed, err := process.InterpolateFile(templateFile, valuesFile, overrides)
 			if err != nil {
 				return err
 			}

@@ -2,7 +2,6 @@ package process
 
 import (
 	"bytes"
-	"fmt"
 	"text/template"
 
 	"github.com/jahid90/composer/lib/file"
@@ -17,7 +16,7 @@ type Variables struct {
 // Interpolate Interpolates variables into a template and returns the composed output
 func Interpolate(templateData []byte, variables *Variables) ([]byte, error) {
 
-	fmt.Printf("%#v", variables)
+	// fmt.Printf("%#v\n", variables)
 
 	var buffer bytes.Buffer
 
@@ -35,7 +34,7 @@ func Interpolate(templateData []byte, variables *Variables) ([]byte, error) {
 }
 
 // InterpolateFile Interpolates a template file with values from a values file and returns the composed output
-func InterpolateFile(templateFile string, valuesFile string) ([]byte, error) {
+func InterpolateFile(templateFile string, valuesFile string, overrides map[interface{}]interface{}) ([]byte, error) {
 
 	templateData, err := file.ReadFile(templateFile)
 	if err != nil {
@@ -50,5 +49,23 @@ func InterpolateFile(templateFile string, valuesFile string) ([]byte, error) {
 	var variables Variables
 	yaml.Unmarshal(valuesData, &variables)
 
-	return Interpolate(templateData, &variables)
+	merged := merge(&variables, overrides)
+
+	return Interpolate(templateData, merged)
+}
+
+func merge(variables *Variables, overrides map[interface{}]interface{}) *Variables {
+
+	merged := Variables{}
+	merged.Values = make(map[interface{}]interface{})
+
+	for k, v := range variables.Values {
+		merged.Values[k] = v
+	}
+
+	for k, v := range overrides {
+		merged.Values[k] = v
+	}
+
+	return &merged
 }

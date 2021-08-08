@@ -1,0 +1,7 @@
+version: 3
+
+commands:
+  hello: 'echo hello'
+  list: 'ls'
+  start:dev: 'PORT=3000 yarn start'
+

@@ -2,6 +2,5 @@ version: "4"
 commands:
   build: go build
   install: go install
-  test: composer compose --in test-data/template.yaml --values test-data/values.yaml | tee test-data/generated.yaml
-  test:local: ./composer compose --in test-data/template.yaml --values test-data/values.yaml | tee test-data/generated.yaml
-
+  test:compose: ./composer compose --in test-data/template.yaml --values test-data/values.yaml --set version=4 | tee test-data/generated.yaml
+  test:docker: cd test-data && ../composer docker --set port=3000 && cat docker-compose.yaml
