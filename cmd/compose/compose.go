@@ -1,17 +1,12 @@
 package compose
 
 import (
-	"os"
-	"text/template"
+	"fmt"
 
 	"github.com/jahid90/composer/lib/file"
+	"github.com/jahid90/composer/lib/process"
 	"github.com/urfave/cli/v2"
-	"gopkg.in/yaml.v2"
 )
-
-type Overrides struct {
-	Values map[string]string `yaml:"values"`
-}
 
 // Cmd A sub-command that prints a greeting
 func Cmd() *cli.Command {
@@ -38,54 +33,22 @@ func Cmd() *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 
-			parsedTemplate, err := parseTemplate(c)
+			templateFile := c.String("in")
+			valuesFile := c.String("values")
+
+			processed, err := process.InterpolateFile(templateFile, valuesFile)
 			if err != nil {
 				return err
 			}
 
-			overrides, err := getOverrides(c)
-			if err != nil {
-				return err
-			}
-
-			err = parsedTemplate.Execute(os.Stdout, overrides)
-			if err != nil {
-				return err
+			outFile := c.String("out")
+			if len(outFile) != 0 {
+				file.WriteFile(outFile, processed)
+			} else {
+				fmt.Println(string(processed))
 			}
 
 			return nil
 		},
 	}
-}
-
-func parseTemplate(c *cli.Context) (*template.Template, error) {
-
-	templateFile := c.String("in")
-
-	templateData, err := file.ReadFile(templateFile)
-	if err != nil {
-		return nil, err
-	}
-
-	parsed, err := template.New("test").Parse(string(templateData))
-	if err != nil {
-		return nil, err
-	}
-
-	return parsed, nil
-}
-
-func getOverrides(c *cli.Context) (*Overrides, error) {
-
-	valuesFile := c.String("values")
-
-	valuesData, err := file.ReadFile(valuesFile)
-	if err != nil {
-		return nil, err
-	}
-
-	var overrides Overrides
-	yaml.Unmarshal(valuesData, &overrides)
-
-	return &overrides, nil
 }
