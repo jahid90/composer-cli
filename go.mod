@@ -1,6 +1,6 @@
 module github.com/jahid90/composer
 
-go 1.16
+go 1.19
 
 require (
 	github.com/urfave/cli/v2 v2.3.0 // indirect
